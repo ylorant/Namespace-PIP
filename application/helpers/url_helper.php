@@ -1,24 +1,24 @@
 <?php
 namespace Helper;
 
-class Url_helper {
+class Url {
 
 	function base_url()
 	{
 		global $config;
 		return $config['base_url'];
 	}
-	
+
 	function segment($seg)
 	{
-		$url = trim($_GET['_url'], '/');
-		$parts = explode('/', $url);
-        if(isset($parts[$seg]))
-            return $parts[$seg];
-        else
-            return false;
+		if(!is_int($seg)) return false;
+
+		$parts = explode('/', $_SERVER['REQUEST_URI']);
+	    return isset($parts[$seg]) ? $parts[$seg] : false;
 	}
-	
+
 }
+
+?>
 
 ?>

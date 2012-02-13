@@ -1,7 +1,7 @@
 <?php
 namespace Helper;
 
-class Session_helper {
+class Session {
 
 	function set($key, $val)
 	{
