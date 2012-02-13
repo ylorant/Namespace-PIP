@@ -1,26 +1,24 @@
 <?php
+namespace Model;
+use \PDO;
 
 class Model {
 
-	private $connection;
-
+	protected $_PDO;
+	protected $_query;
+	protected $_curParamID = 1;
+	
 	public function __construct()
 	{
-		global $config;
+		$this->_PDO = new PDO(DB_ENGINE.':host='.DB_HOST.';port='.DB_PORT.';dbname='.DB_DBNAME, DB_USER, DB_PW);
+		$this->_PDO->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+		$this->_PDO->exec('SET NAMES utf8');
+		call_user_func_array(array($this, '__init'), func_get_args());
+	}
+	
+	public function __init()
+	{
 		
-		$this->connection = mysql_pconnect($config['db_host'], $config['db_username'], $config['db_password']) or die('MySQL Error: '. mysql_error());
-		mysql_select_db($config['db_name'], $this->connection);
-	}
-
-	public function escapeString($string)
-	{
-		return mysql_real_escape_string($string);
-	}
-
-	public function escapeArray($array)
-	{
-	    array_walk_recursive($array, create_function('&$v', '$v = mysql_real_escape_string($v);'));
-		return $array;
 	}
 	
 	public function to_bool($val)
@@ -43,20 +41,55 @@ class Model {
 	    return date('Y-m-d H:i:s', $val);
 	}
 	
-	public function query($qry)
+	public function prepare($query)
 	{
-		$result = mysql_query($qry) or die('MySQL Error: '. mysql_error());
-		$resultObjects = array();
-
-		while($row = mysql_fetch_object($result)) $resultObjects[] = $row;
-
-		return $resultObjects;
+		$this->_query = $this->_PDO->prepare($query);
 	}
-
-	public function execute($qry)
+	
+	public function bind($name, $value = NULL)
 	{
-		$exec = mysql_query($qry) or die('MySQL Error: '. mysql_error());
-		return $exec;
+		if($value === NULL)
+			list($value, $name) = array($name, ++$this->_curParamID);
+		
+		$type = PDO::PARAM_STR;
+		if(is_int($value))
+			$type = PDO::PARAM_INT;
+		
+		$this->_query->bindValue($name, $value, $type);
+	}
+	
+	public function execute()
+	{
+		$values = array();
+		foreach(func_get_args() as $arg)
+			$values[] = $arg;
+		
+		return $this->_query->execute($values);
+	}
+	
+	public function fetch()
+	{
+		return $this->_query->fetch(PDO::FETCH_ASSOC);
+	}
+	
+	public function fetchAll()
+	{
+		return $this->_query->fetchAll(PDO::FETCH_ASSOC);
+	}
+	
+	public function reset()
+	{
+		$this->_query->resetCursor();
+	}
+	
+	public function drop()
+	{
+		unset($this->_query);
+	}
+	
+	public function lastInsertID()
+	{
+		return $this->_PDO->lastInsertId();
 	}
     
 }

@@ -1,4 +1,5 @@
 <?php
+namespace Helper;
 
 class Url_helper {
 
@@ -10,10 +11,12 @@ class Url_helper {
 	
 	function segment($seg)
 	{
-		if(!is_int($seg)) return false;
-		
-		$parts = explode('/', $_SERVER['REQUEST_URI']);
-	    return isset($parts[$seg]) ? $parts[$seg] : false;
+		$url = trim($_GET['_url'], '/');
+		$parts = explode('/', $url);
+        if(isset($parts[$seg]))
+            return $parts[$seg];
+        else
+            return false;
 	}
 	
 }

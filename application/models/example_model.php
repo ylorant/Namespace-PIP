@@ -1,6 +1,7 @@
 <?php
+namespace Model;
 
-class Example_model extends Model {
+class Example extends Model {
 	
 	public function getSomething($id)
 	{

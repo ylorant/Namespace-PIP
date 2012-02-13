@@ -1,9 +1,7 @@
-<IfModule mod_rewrite.c>
+# Turn on URL rewriting
 RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d 
-RewriteRule . index.php [L]
-</IfModule>
 
-# Prevent file browsing
-Options -Indexes
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+RewriteRule ^(.*)$ index.php?/$1 [L]

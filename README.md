@@ -4,9 +4,11 @@ PIP is a tiny application framework built for people who use a LAMP stack. PIP a
 
 Visit [http://gilbitron.github.com/PIP](http://gilbitron.github.com/PIP/) for more information and documentation.
 
+This particular version leans on namespaces, a particular feature in PHP 5.3, which allow the final programmer (yes, you) to use same names for a controller and a model for example.
+
 ## Requirements
 
-* PHP 5.1 or greater
+* PHP 5.3 or greater
 * MySQL 4.1.2 or greater
 * The mod_rewrite Apache module
 
