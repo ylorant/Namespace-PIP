@@ -10,9 +10,8 @@ class Model {
 	
 	public function __construct()
 	{
-		$this->_PDO = new PDO(DB_ENGINE.':host='.DB_HOST.';port='.DB_PORT.';dbname='.DB_DBNAME, DB_USER, DB_PW);
-		$this->_PDO->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-		$this->_PDO->exec('SET NAMES utf8');
+                ob_start();
+		$this->_PDO = DatabaseHandler::get();
 		call_user_func_array(array($this, '__init'), func_get_args());
 	}
 	
@@ -21,29 +20,62 @@ class Model {
 		
 	}
 	
-	public function to_bool($val)
+	public static function toArray($object)
 	{
-	    return !!$val;
+		$array = array();
+		foreach($object as $name => $value)
+		{
+			if(!is_object($value))
+				$array[$name] = $value;
+			else
+				$array[$name] = self::toArray($value);
+		}
+		
+		return $array;
 	}
 	
-	public function to_date($val)
+	public static function serialize($object)
 	{
-	    return date('Y-m-d', $val);
+		$data = array();
+		foreach($object as $name => $value)
+		{
+			if($name[0] != '_')
+			{
+				if(is_object($value))
+					$data[$name] = 'object/'.get_class($value).':'.Model::serialize($value);
+				else
+					$data[$name] = $value;
+			}
+		}
+		
+		return serialize($data);
 	}
 	
-	public function to_time($val)
+	public static function unserialize($data, $object)
 	{
-	    return date('H:i:s', $val);
-	}
-	
-	public function to_datetime($val)
-	{
-	    return date('Y-m-d H:i:s', $val);
+		foreach(unserialize($data) as $name => $value)
+		{
+			if(strpos($value,'/'))
+			{
+				$parts = explode(':', $value, 2);
+				$parts[0] = explode('/', $parts[0], 2);
+				if($parts[0][0] == 'object')
+				{
+					$objName = $parts[0][1];
+					$value = new $objName();
+					Model::unserialize($parts[1], $value);
+				}
+			}
+			
+			$object->$name = $value;
+		}
 	}
 	
 	public function prepare($query)
 	{
 		$this->_query = $this->_PDO->prepare($query);
+		
+		return $this->_query;
 	}
 	
 	public function bind($name, $value = NULL)
@@ -58,13 +90,20 @@ class Model {
 		$this->_query->bindValue($name, $value, $type);
 	}
 	
-	public function execute()
+	public function execute($query = NULL)
 	{
 		$values = array();
-		foreach(func_get_args() as $arg)
+		
+		$arglist = func_get_args();
+		if(is_object($query) && $query instanceof PDOStatement)
+			array_shift($arglist);
+		else
+			$query = $this->_query;
+		
+		foreach($arglist as $arg)
 			$values[] = $arg;
 		
-		return $this->_query->execute($values);
+		return $query->execute($values);
 	}
 	
 	public function fetch()
@@ -92,5 +131,30 @@ class Model {
 		return $this->_PDO->lastInsertId();
 	}
     
+    public function loadModel($name)
+	{
+		require_once(APP_DIR .'models/'. strtolower($name) .'.php');
+		
+		$name = '\\Model\\'.$name;
+		$model = new $name;
+		return $model;
+	}
 }
+
+class DatabaseHandler
+{
+	private static $_pdo;
+	public static function get()
+	{
+		if(self::$_pdo === NULL)
+		{
+			self::$_pdo = new PDO(DB_ENGINE.':host='.DB_HOST.';port='.DB_PORT.';dbname='.DB_DBNAME, DB_USER, DB_PW);
+			self::$_pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+			self::$_pdo->exec('SET NAMES utf8');
+		}
+		
+		return self::$_pdo;
+	}
+}
+
 ?>

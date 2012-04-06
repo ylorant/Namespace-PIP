@@ -61,7 +61,7 @@ function pip()
 	
 	// Create object and call method
 	$obj = new $controller;
-    call_user_method_array($action, $obj, $params);
+    call_user_func_array(array( $obj, $action), $params);
     die();
 }
 

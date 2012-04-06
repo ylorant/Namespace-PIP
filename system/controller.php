@@ -2,8 +2,8 @@
 namespace Controller;
 use \View\View;
 
-class Controller {
-	
+class Controller
+{
 	public function loadModel($name)
 	{
 		require(APP_DIR .'models/'. strtolower($name) .'.php');
@@ -37,6 +37,7 @@ class Controller {
 		global $config;
 		
 		header('Location: '. $config['base_url'] . $loc);
+		die();
 	}
     
 }
