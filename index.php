@@ -20,9 +20,11 @@ require(ROOT_DIR .'system/model.php');
 require(ROOT_DIR .'system/view.php');
 require(ROOT_DIR .'system/controller.php');
 require(ROOT_DIR .'system/pip.php');
+require(ROOT_DIR .'system/miscfunc.php');
 
 // Define base URL
 global $config;
+set_exception_handler('exception_handler');
 define('BASE_URL', $config['base_url']);
 Controller\pip();
 

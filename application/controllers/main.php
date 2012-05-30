@@ -1,5 +1,6 @@
 <?php
 namespace Controller;
+use \Exception;
 
 class Main extends Controller {
 	
@@ -9,6 +10,10 @@ class Main extends Controller {
 		$template->render();
 	}
     
+    function exception()
+    {
+		throw new Exception("error");
+	}
 }
 
 ?>
