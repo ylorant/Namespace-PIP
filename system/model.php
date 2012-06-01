@@ -1,6 +1,7 @@
 <?php
 namespace Model;
 use \PDO;
+use \Exception;
 
 class Model {
 
@@ -10,7 +11,6 @@ class Model {
 	
 	public function __construct()
 	{
-                ob_start();
 		$this->_PDO = DatabaseHandler::get();
 		call_user_func_array(array($this, '__init'), func_get_args());
 	}
@@ -20,62 +20,37 @@ class Model {
 		
 	}
 	
-	public static function toArray($object)
+	public function to_bool($val)
 	{
-		$array = array();
-		foreach($object as $name => $value)
-		{
-			if(!is_object($value))
-				$array[$name] = $value;
-			else
-				$array[$name] = self::toArray($value);
-		}
-		
-		return $array;
+	    return !!$val;
 	}
 	
-	public static function serialize($object)
+	public function to_date($val)
 	{
-		$data = array();
-		foreach($object as $name => $value)
-		{
-			if($name[0] != '_')
-			{
-				if(is_object($value))
-					$data[$name] = 'object/'.get_class($value).':'.Model::serialize($value);
-				else
-					$data[$name] = $value;
-			}
-		}
-		
-		return serialize($data);
+	    return date('Y-m-d', $val);
 	}
 	
-	public static function unserialize($data, $object)
+	public function to_time($val)
 	{
-		foreach(unserialize($data) as $name => $value)
-		{
-			if(strpos($value,'/'))
-			{
-				$parts = explode(':', $value, 2);
-				$parts[0] = explode('/', $parts[0], 2);
-				if($parts[0][0] == 'object')
-				{
-					$objName = $parts[0][1];
-					$value = new $objName();
-					Model::unserialize($parts[1], $value);
-				}
-			}
-			
-			$object->$name = $value;
-		}
+	    return date('H:i:s', $val);
+	}
+	
+	public function to_datetime($val)
+	{
+	    return date('Y-m-d H:i:s', $val);
 	}
 	
 	public function prepare($query)
 	{
+	    try
+	    {
 		$this->_query = $this->_PDO->prepare($query);
-		
-		return $this->_query;
+	    }
+	    catch(PDOException $e)
+	    {
+		trigger_error('Error while preparing');
+		throw $e;
+	    }
 	}
 	
 	public function bind($name, $value = NULL)
@@ -90,20 +65,30 @@ class Model {
 		$this->_query->bindValue($name, $value, $type);
 	}
 	
-	public function execute($query = NULL)
+	public function execute()
 	{
 		$values = array();
-		
-		$arglist = func_get_args();
-		if(is_object($query) && $query instanceof PDOStatement)
-			array_shift($arglist);
-		else
-			$query = $this->_query;
-		
-		foreach($arglist as $arg)
+		foreach(func_get_args() as $arg)
 			$values[] = $arg;
 		
-		return $query->execute($values);
+		$ret = false;
+	        try
+	        {
+		    $ret = $this->_query->execute($values);
+		}
+	        catch(PDOException $e)
+	        {
+		    trigger_error('Error while executing');
+		    throw $e;
+		}
+	        
+	        if($ret == FALSE)
+	        {
+		    $error = $this->_PDO->errorInfo();
+		    throw new Exception('[SQLSTATE('.$error[0].'): '.$error[1].'] '.$error[2]);
+	        }
+	        
+   	        return $ret;
 	}
 	
 	public function fetch()
@@ -131,14 +116,6 @@ class Model {
 		return $this->_PDO->lastInsertId();
 	}
     
-    public function loadModel($name)
-	{
-		require_once(APP_DIR .'models/'. strtolower($name) .'.php');
-		
-		$name = '\\Model\\'.$name;
-		$model = new $name;
-		return $model;
-	}
 }
 
 class DatabaseHandler
@@ -148,9 +125,24 @@ class DatabaseHandler
 	{
 		if(self::$_pdo === NULL)
 		{
-			self::$_pdo = new PDO(DB_ENGINE.':host='.DB_HOST.';port='.DB_PORT.';dbname='.DB_DBNAME, DB_USER, DB_PW);
-			self::$_pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-			self::$_pdo->exec('SET NAMES utf8');
+			try
+			{
+				if(DB_ENGINE != 'sqlite')
+				        self::$_pdo = new PDO(DB_ENGINE.':host='.DB_HOST.';port='.DB_PORT.';dbname='.DB_DBNAME, DB_USER, DB_PW);
+				else
+			        {
+			                trigger_error('Connecting to database: '.DB_ENGINE.':'.DB_FILE);
+				        self::$_pdo = new PDO(DB_ENGINE.':'.DB_FILE);
+			        }
+			        
+			        self::$_pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+				self::$_pdo->exec('SET NAMES utf8');
+			}
+			catch(PDOException $e)
+			{
+			    trigger_error('Error while connecting');
+			    throw $e;
+			}
 		}
 		
 		return self::$_pdo;
