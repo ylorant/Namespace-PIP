@@ -3,12 +3,12 @@ namespace Helper;
 
 class Session
 {
-	function __set($key, $val)
+	public function __set($key, $val)
 	{
 		$_SESSION[$key] = $val;
 	}
 	
-	function __get($key)
+	public function __get($key)
 	{
 		if(isset($_SESSION[$key]))
 			return $_SESSION[$key];
@@ -16,7 +16,23 @@ class Session
 		return NULL;
 	}
 	
-	function destroy()
+        public function __construct()
+        {
+	        global $config;
+	        if(!empty($config['session_check']))
+	        {
+	                $check = explode('=', $config['session_check']);
+		        if(isset($_SESSION[$check[0]]) && $_SESSION[$check[0]] == $check[1])
+		                 return;
+		        else
+		        {
+			         $error = new $config['error_controller']();
+			         $error-
+			}
+		}
+	}
+        
+	public function destroy()
 	{
 		session_destroy();
 	}
