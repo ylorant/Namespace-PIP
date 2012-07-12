@@ -23,11 +23,12 @@ class Session
 	        {
 	                $check = explode('=', $config['session_check']);
 		        if(isset($_SESSION[$check[0]]) && $_SESSION[$check[0]] == $check[1])
-		                 return;
+					return;
 		        else
 		        {
-			         $error = new $config['error_controller']();
-			         $error-
+			        $error = new $config['error_controller']();
+			        $error->check_failed($check[0], $check[1]);
+				}
 			}
 		}
 	}
