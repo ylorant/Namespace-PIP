@@ -1,18 +1,14 @@
 <?php
 namespace Controller;
 use \Exception;
+use \View\View;
 
 class Main extends Controller {
 	
 	function index()
 	{
-		$template = $this->loadView('main');
+		$template = new View('main');
 		$template->render();
-	}
-    
-    function exception()
-    {
-		throw new Exception("error");
 	}
 }
 

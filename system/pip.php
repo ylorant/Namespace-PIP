@@ -1,5 +1,7 @@
 <?php
 namespace Controller;
+use \Exception, \Debug;
+use \View\View;
 
 function pip()
 {
@@ -16,52 +18,49 @@ function pip()
     
 	// Get our url path and trim the / of the left and the right
 	if($request_url != $script_url) $url = trim(preg_replace('/'. str_replace('/', '\/', str_replace('index.php', '', $script_url)) .'/', '', $request_url, 1), '/');
-    
-	// Split the url into segments
-	$segments = explode('/', $url, 3);
 	
-	// Do our default checks
-	if(isset($segments[0]) && $segments[0] != '') $controller = $segments[0];
-	if(isset($segments[1]) && $segments[1] != '') $action = $segments[1];
-	// Get our controller file
-    $path = APP_DIR . 'controllers/' . strtolower($controller) . '.php';
-    
-    $params = array();
-	if(file_exists($path)){
-		if(isset($segments[2]))
-			$params = explode('/', $segments[2]);
-		else
-			$params = array();
-        require_once($path);
-        $controller = 'Controller\\'.$controller;
-	} else {
-		$path = APP_DIR . 'controllers/' . $config['default_controller_file'];
-		require_once($path);
-		if($controller == $config['default_controller'])
-			$controller = $action;
-		if(method_exists($config['default_controller'], $controller)){
-			$params = explode('/', array_pop($segments));
-			if(count($segments) >= 2)
-				array_unshift($params, array_pop($segments));
-			$action = $controller;
-			$controller = $config['default_controller'];
-		} else {
-			$params = explode('/', $url);
-			$controller = $config['error_controller'];
-			require_once(APP_DIR . 'controllers/' . $config['error_controller_file']);
+	define('REQUESTED_PAGE', $url);
+	
+    //         //
+	// Routing //
+	//         //
+	
+    if(isset($config['routes']) && !empty($config['routes']))
+    {
+		foreach($config['routes'] as $route)
+		{
+			
+			if($route->match($url))
+			{
+				$call = explode('::', $route->mapping());
+				
+				if($call[0][0] != '\\')
+					$call[0] = '\\Controller\\'.$call[0];
+				
+				$class = $call[0];
+				$func = $call[1];
+				$obj = new $class();
+				
+				if($route->callback !== null)
+				{
+					$cb = $route->callback;
+					$cb($obj);
+				}
+				
+				call_user_func_array(array($obj, $func), $route->matches);
+				die();
+			}
 		}
 	}
     
-    // Check the action exists
-    if(!method_exists($controller, $action)){
-        $controller = $config['error_controller'];
-        require_once(APP_DIR . 'controllers/' . $config['error_controller_file']);
-        $action = 'index';
-    }
+    // Error handling (404)
+	$controller = $config['error_controller'];
+	$action = 'index';
 	
 	// Create object and call method
 	$obj = new $controller;
-    call_user_func_array(array( $obj, $action), $params);
+    call_user_func_array(array( $obj, $action), $route->matches);
+    
     die();
 }
 

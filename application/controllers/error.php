@@ -1,5 +1,9 @@
 <?php
 namespace Controller;
+use \Debug;
+use \Model\Exception as ExceptionModel;
+use \View\View;
+use \Exception\NotFoundException;
 
 class Error extends Controller {
 	
@@ -10,16 +14,27 @@ class Error extends Controller {
 	
 	function error404()
 	{
-		echo '<h1>404 Error</h1>';
-		echo '<p>Looks like this page doesn\'t exist</p>';
+		Debug::exception(new NotFoundException(REQUESTED_PAGE));
+		
+		//We load the main page.
+		$main = new Main();
+		$main->index();
 	}
     
-    public function exception($e)
+    /*
+     * This function is called when an exception is NOT catched and hereby terminates the script.
+     * Here, we log the error and show a customizable error output (using a view).
+     * 
+     */
+    function exception($e)
     {
-		echo '<h1>Exception caught !</h1>';
-		echo '<p>Exception caught in '.$e->getFile().' at line '.$e->getLine().' : '.$e->getMessage().'</p>';
-		echo '<h2>Stack trace</h2>';
-		echo '<pre>'.$e->getTraceAsString().'</pre>';
+		Debug::exception($e);
+		
+		$this->HTTPReturnCode(500);
+		$view = new View('error');
+		$view->member = null;
+		$view->render();
+		return true;
 	}
 }
 
