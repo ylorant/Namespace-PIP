@@ -4,25 +4,101 @@
     <meta charset='utf-8'>
     
     <title>PIP - A tiny PHP application framework</title>
-    <meta name="description" content="PIP is a tiny PHP application framework built for people who use a LAMP stack.">
-    <meta name="author" content="Gilbert Pellegrom">
+    <meta name="description" content="Namespace-PIP is a small framework forked from PIP. It adds to it namespaces and a bunch of useful stuff">
+    <meta name="author" content="Yohann Lorant">
     
+<!--
+    <link href='http://fonts.googleapis.com/css?family=Overlock:900' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Shanti' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Asap' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Convergence' rel='stylesheet' type='text/css'>
+-->
+    <link href='http://fonts.googleapis.com/css?family=Signika' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Karla' rel='stylesheet' type='text/css'>
+    
+    <link rel="stylesheet" href="normalize.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="bootstrap.css" type="text/css" media="screen" />
     <link rel="stylesheet" href="style.css" type="text/css" media="screen" />
-    
-    <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-3892196-27']);
-    _gaq.push(['_trackPageview']);
-    (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-    </script>
 </head>
 <body>
-
-    <div id="container">
+	<div class="navbar navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container">
+				<a class="brand">PIP</a>
+				<ul class="nav">
+					<li class="active">
+						<a href="#top">Top</a>
+					</li>
+					<li><a href="#features">Features</a></li>
+					<li><a href="#requirements">Requirements</a></li>
+					<li><a href="#install">Downloading and Installing</a></li>
+					<li><a href="#documentation">Manual</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="main container">
+		<div id="top" class="hero-unit">
+			<h1>Namespace-PIP</h1>
+			<p>
+				Namespace-PIP is a small framework made in PHP from <a href="http://github.com/gilbitron/PIP">PIP by Gilbert Pellegrom</a>. It aims to be easy to use, but also to help the webmaster using it to make better code.
+			</p>
+		</div>
+		
+		<div id="features" class="part span12">
+			<h1>Features</h1>
+			<p>
+				Since Namespace-PIP is made from PIP, it shares its features. It also adds some features to it:
+			</p>
+			<ul>
+				<li>Namespaces, allowing the code to be clearly structured.</li>
+				<li>New routing system, allowing static routes and dynamic routes (depending on the class/method for example).</li>
+				<li>Improved error handling, based on exceptions. Here, even PHP regular errors are morphed into exceptions.</li>
+				<li>Some other additions.</li>
+			</ul>
+		</div>
+		
+		<div id="requirements" class="part span12">
+			<h1>Requirements</h1>
+			<p>
+				To make Namespace-PIP work, you'll need this :
+			</p>
+			<ul>
+				<li>An Apache2 server with mod_rewrite enabled (and .htacess allowed)</li>
+				<li>PHP, at least v5.3 (for namespaces)</li>
+				<li>If you are using a database, PDO need to be activated.</li>
+			</ul>
+		</div>
+		
+		<div id="install" class="part span12">
+			<h1>Downloading and Installing</h1>
+			<h2>Downloading</h2>
+			<p>
+				You can download Namespace-PIP using 3 ways. These versions are always the snapshot of the last version of the framework, from its Git repository: 
+			</p>
+			<ul>
+				<li>Using a <a href="https://github.com/ylorant/Namespace-PIP/zipball/master">Zip</a> compressed archive snapshot</li>
+				<li>Using a <a href="https://github.com/ylorant/Namespace-PIP/tarball/master">GZipped Tar</a> archive snapshot</li>
+				<li>Directly by cloning the Git repository: <pre>$ git clone git://github.com/ylorant/Namespace-PIP.git</pre></li>
+			</ul> 
+			
+			<h2>Installing</h2>
+			<p>
+				Installing Namespace-PIP is very simple. Everything is already pre-configured, the only things you need to do to make it work is:
+			</p>
+			<ol>
+				<li>Extract the archive in a directory of your webserver.</li>
+				<li>Go into the <span class="monospaced">application/config</span> folder, and rename <span class="monospaced">config.sample.php</span> into <span class="monospaced">config.php</span></li>
+				<li>Open it with a regular text editor and change the value of <span class="monospaced">$config['base_url']</span> with the path to the application base directory, relative to your webserver's root.</li>
+				<li>That's all for a basic configuration. Go to the right URL in your browser and you should see the default page showing up.</li>
+			</ol>
+		</div>
+		
+		<div id="documentation" class="part span12">
+			<h1><a href="doc/index.html">Manual</a></h1>
+		</div>
+	</div>
+    <!-- <div id="container">
 
         <h1 id="title"><a href="http://github.com/gilbitron/PIP">PIP</a></h1>
 
@@ -323,6 +399,6 @@ $config['db_password'] = ''; // Database password</code></pre>
     </div>
     
     <a href="https://github.com/gilbitron/PIP"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://d3nwyuy0nl342s.cloudfront.net/img/bec6c51521dcc8148146135149fe06a9cc737577/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub"></a>
-
+	-->
 </body>
 </html>
