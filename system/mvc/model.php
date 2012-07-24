@@ -2,7 +2,6 @@
 namespace Model;
 use \PDO;
 use \Exception\SQLException;
-use \Debug;
 
 class Model {
 
@@ -104,7 +103,6 @@ class Model {
 		}
 		catch(PDOException $e)
 		{
-			trigger_error('Error while preparing');
 			throw $e;
 		}
 	}
@@ -147,7 +145,6 @@ class Model {
 		}
 	    catch(PDOException $e)
 	    {
-			trigger_error('Error while executing');
 			throw $e;
 		}
 	        
@@ -198,20 +195,16 @@ class DatabaseHandler
 			try
 			{
 				if(DB_ENGINE != 'sqlite')
-				        self::$_pdo = new PDO(DB_ENGINE.':host='.DB_HOST.';port='.DB_PORT.';dbname='.DB_DBNAME, DB_USER, DB_PW);
+					self::$_pdo = new PDO(DB_ENGINE.':host='.DB_HOST.';port='.DB_PORT.';dbname='.DB_DBNAME, DB_USER, DB_PW);
 				else
-			        {
-			                trigger_error('Connecting to database: '.DB_ENGINE.':'.DB_FILE);
-				        self::$_pdo = new PDO(DB_ENGINE.':'.DB_FILE);
-			        }
+					self::$_pdo = new PDO(DB_ENGINE.':'.DB_FILE);
 			        
-			        self::$_pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+				self::$_pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 				self::$_pdo->exec('SET NAMES utf8');
 			}
 			catch(PDOException $e)
 			{
-			    trigger_error('Error while connecting');
-			    throw $e;
+				throw $e;
 			}
 		}
 		
