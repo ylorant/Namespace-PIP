@@ -1,5 +1,5 @@
 <?php
-use Exception\PHPErrorException;
+use \Exception\PHPErrorException;
 use \View\View;
 
 //Exception handler
@@ -70,7 +70,7 @@ function __autoload($class)
 				if(is_file($path))
 				{
 					include_once($path);
-					return;
+					return true;
 				}
 			}
 			
@@ -90,7 +90,7 @@ function shutdown()
 		die();
 	
 	$error = error_get_last();
-    if($error !== NULL) //If a fatal error occured, we log it into the debug section
+    if($error !== NULL && $error['type'] == E_ERROR) //If a fatal error occured, we log it into the debug section
 		exception_handler(new PHPErrorException($error['file'], $error['line'], $error['message'], $error['type'])) + die();
     
     if($config['debug'] === true)

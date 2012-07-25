@@ -1,11 +1,11 @@
 <?php
 namespace Controller;
-use \Exception;
 use \View\View;
 
-class Main extends Controller {
+class Main extends Controller
+{
 	
-	function index()
+	public function index()
 	{
 		$template = new View('main');
 		$template->render();
