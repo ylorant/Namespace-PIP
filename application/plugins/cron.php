@@ -155,7 +155,7 @@ class SQLCronTask extends CronTask
 		$this->query = $query;
 	}
 	
-	public function call($database)
+	public function call($database = null)
 	{
 		$query = $database->prepare($this->query);
 		$query->execute($parameters);
