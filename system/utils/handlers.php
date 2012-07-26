@@ -69,11 +69,10 @@ function __autoload($class)
 			{
 				if(is_file($path))
 				{
-					include_once($path);
+					require($path);
 					return true;
 				}
 			}
-			
 			throw new \Exception\UnknownClassException($class); //Not found -> error
 		}
 		else
@@ -90,7 +89,7 @@ function shutdown()
 		die();
 	
 	$error = error_get_last();
-    if($error !== NULL && $error['type'] == E_ERROR) //If a fatal error occured, we log it into the debug section
+	if($error !== NULL && $error['type'] == E_ERROR) //If a fatal error occured, we log it into the debug section
 		exception_handler(new PHPErrorException($error['file'], $error['line'], $error['message'], $error['type'])) + die();
     
     if($config['debug'] === true)
@@ -99,3 +98,8 @@ function shutdown()
 		$view->render();
 	}
 }
+
+__autoload("Exception\\PHPErrorException"); //Preventing class loading error while using error handler
+set_exception_handler('exception_handler');
+set_error_handler('error_handler');
+register_shutdown_function('shutdown');

@@ -155,7 +155,7 @@ class SQLCronTask extends CronTask
 		$this->query = $query;
 	}
 	
-	public function call($database = null)
+	public function call($database)
 	{
 		$query = $database->prepare($this->query);
 		$query->execute($parameters);
@@ -164,12 +164,3 @@ class SQLCronTask extends CronTask
 			call_user_func_array($this->callback, $query->fetchAll);
 	}
 }
-
-function disconnect()
-{
-	
-}
-
-new Cron();
-Cron::add(new CronTask(time() + 10, 'disconnect'));
-Cron::execute();

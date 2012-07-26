@@ -89,7 +89,6 @@ class Route
 				$j = 0;
 				$k = -1;
 				$loadedClass = null;
-				Debug::show($path, 'Path');
 				foreach($pieces as $i => $el)
 				{
 					if(!isset($path[$k]) || $path[$k][0] != '[' || $path[$k][strlen($path[$k])-1] != ']')

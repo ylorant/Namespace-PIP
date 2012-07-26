@@ -31,6 +31,9 @@ class PHPErrorException extends FrameworkException
 			case E_NOTICE:
 				$codestr = 'Notice (E_NOTICE)';
 				break;
+			case E_STRICT:
+				$codestr = 'Strictness (E_STRICT)';
+				break;
 			default:
 				$codestr = 'Unknown(0x'.(!empty($this->code) ? dechex($this->code) : '0').')';
 		}

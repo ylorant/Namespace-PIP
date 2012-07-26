@@ -8,7 +8,6 @@ session_start();
 
 // Defines
 define('ROOT_DIR', realpath(dirname(__FILE__)) .'/');
-
 define('APP_DIR', ROOT_DIR .'application/');
 if(!$_SERVER['QUERY_STRING'])
 	define('CURRENT_PAGE', '/index');
@@ -31,10 +30,8 @@ $config['autoload']['Route'] = ROOT_DIR.'system/utils/route.php';
 require(ROOT_DIR .'system/utils/handlers.php');
 require(ROOT_DIR .'system/pip.php');
 require(APP_DIR .'config/config.php');
+Debug::getInstance();
 
-set_exception_handler('exception_handler');
-set_error_handler('error_handler');
-register_shutdown_function('shutdown');
 define('BASE_URL', $config['base_url']);
 Controller\pip();
 
