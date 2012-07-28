@@ -29,7 +29,6 @@ function pip()
     {
 		foreach($config['routes'] as $route)
 		{
-			
 			if($route->match($url))
 			{
 				$call = explode('::', $route->mapping());

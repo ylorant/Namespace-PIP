@@ -171,6 +171,7 @@ class Route
 						if(!is_numeric($el))
 							return false;
 						$capture = true;
+						$el = intval($el);
 					}
 					elseif($currentpath == '{string}')
 					{
