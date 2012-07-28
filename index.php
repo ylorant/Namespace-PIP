@@ -22,6 +22,7 @@ $config['autoload'] = array();
 
 $config['autoload']['Controller\Controller'] = ROOT_DIR .'system/mvc/controller.php';
 $config['autoload']['Model\Model'] = ROOT_DIR .'system/mvc/model.php';
+$config['autoload']['Model\ModelNoDB'] = ROOT_DIR .'system/mvc/model.nodb.php';
 $config['autoload']['View\View'] = ROOT_DIR .'system/mvc/view.php';
 $config['autoload']['Debug'] = ROOT_DIR .'system/utils/debug.php';
 $config['autoload']['Route'] = ROOT_DIR.'system/utils/route.php';

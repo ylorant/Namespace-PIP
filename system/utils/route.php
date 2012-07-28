@@ -54,8 +54,9 @@ class Route
 		
 		foreach($this->matches as $id => $value)
 		{
-			if(strpos($mapping, '$'.($id+1)))
+			if(strpos($mapping, '$'.($id+1)) !== FALSE)
 			{
+				
 				$mapping = str_replace('$'.($id+1), $value, $mapping);
 				unset($this->matches[$id]);
 			}
@@ -91,6 +92,7 @@ class Route
 				$loadedClass = null;
 				foreach($pieces as $i => $el)
 				{
+					$capture = false;
 					if(!isset($path[$k]) || $path[$k][0] != '[' || $path[$k][strlen($path[$k])-1] != ']')
 					{
 						$k++;
@@ -106,16 +108,14 @@ class Route
 					
 					if(substr($currentpath, 0, 3) == '{f:')
 					{
-						foreach($matches as $match)
-						{
-							$class = substr($path[$i], 3, -1);
-							if($class[0] != '\\')
-										$class = 'Controller\\'.$class;
-							$func = $match[2];
-							$obj = new $class();
-							$currentpath = $obj->$func($url);
-							
-						}
+						$class = substr($path[$k], 3, -1);
+						$call = explode('::', $class);
+						if($call[0][0] != '\\')
+									$call[0] = 'Controller\\'.$call[0];
+						$func = $call[1];
+						$obj = new $call[0]();
+						$currentpath = $obj->$func($url);
+						$capture = true;
 					}
 					
 					if(substr($currentpath, 0, 3) == '{m:')
@@ -136,7 +136,8 @@ class Route
 						
 						if(!method_exists($class, $el))
 							return false;
-						$this->matches[$j++] = $el;
+						$loadedClass = $class;
+						$capture = true;
 					}
 					elseif($currentpath == '{class}')
 					{
@@ -146,7 +147,7 @@ class Route
 						//Try to load the class. Failing to load it will result in a false return.
 						try
 						{
-							__autoload($el);
+							__autoload($class);
 						}
 						catch(\Exception\UnknownClassException $e)
 						{
@@ -163,23 +164,26 @@ class Route
 						if(!method_exists($loadedClass, $el))
 							return false;
 							
-						$this->matches[$j++] = $el;
+						$capture = true;
 					}
 					elseif($currentpath == '{int}')
 					{
 						if(!is_numeric($el))
 							return false;
-						$this->matches[$j++] = $el;
+						$capture = true;
 					}
 					elseif($currentpath == '{string}')
 					{
-						$this->matches[$j++] = $el;
+						$capture = true;
 					}
 					else
 					{
 						if($el != $currentpath)
 							return false;
 					}
+					
+					if($capture == true)
+						$this->matches[$j++] = $el;
 				}
 				return true;
 				break;

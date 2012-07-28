@@ -34,7 +34,7 @@ function pip()
 			{
 				$call = explode('::', $route->mapping());
 				
-				if($call[0][0] != '\\')
+				if(strpos($call[0], 'Controller\\') === FALSE)
 					$call[0] = '\\Controller\\'.$call[0];
 				
 				$class = $call[0];
