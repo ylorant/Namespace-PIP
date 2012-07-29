@@ -15,7 +15,6 @@ $config['hash_salt'] = ''; //Hash salt for passwords
 $config['routes'] = array(
 	new Route(Route::TYPE_STATIC, '', 'Main::index'),
 	new Route(Route::TYPE_DYNAMIC, array('{m:Main}', '[{string}]'), 'Main::$1'),
-	new Route(Route::TYPE_DYNAMIC, array('{class}'), '$1::index'),
 	new Route(Route::TYPE_DYNAMIC, array('{class}', '{method}', '[{string}]'), '$1::$2'),
 	new Route(Route::TYPE_DYNAMIC, array('{class}', '[{string}]'), '$1::index'),
 );

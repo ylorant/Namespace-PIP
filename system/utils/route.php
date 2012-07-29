@@ -127,7 +127,8 @@ class Route
 						//Try to load the class. Failing to load it will result in a false return.
 						try
 						{
-							__autoload($class);
+							if(!class_exists($class))
+								__autoload($class);
 						}
 						catch(\Exception\UnknownClassException $e)
 						{
@@ -147,7 +148,8 @@ class Route
 						//Try to load the class. Failing to load it will result in a false return.
 						try
 						{
-							__autoload($class);
+							if(!class_exists($class))
+								__autoload($class);
 						}
 						catch(\Exception\UnknownClassException $e)
 						{
