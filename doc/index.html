@@ -10,16 +10,20 @@
     <link href='http://fonts.googleapis.com/css?family=Signika' rel='stylesheet' type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Karla' rel='stylesheet' type='text/css'>
     
+    <link href="../css/prettify.css" type="text/css" rel="stylesheet" />
     <link rel="stylesheet" href="../normalize.css" type="text/css" media="screen" />
     <link rel="stylesheet" href="../bootstrap.css" type="text/css" media="screen" />
     <link rel="stylesheet" href="../style.css" type="text/css" media="screen" />
+    
+	<script type="text/javascript" src="../js/prettify.js"></script>
 </head>
-<body>
+<body onload="prettyPrint();">
 	<div class="navbar navbar-fixed-top">
 		<div class="navbar-inner">
 			<div class="container">
 				<a class="brand">PIP</a>
 				<ul class="nav">
+					<li><a href="../index.html">Main page</a></li>
 					<li><a href="#top">Back to top</a></li>
 				</ul>
 			</div>
@@ -34,16 +38,116 @@
 					<h1>Table of contents</h1>
 				<div class="span4">
 					<ul class="nav nav-list">
+<!--
 						<li><a href="#getting-started">Getting started</a></li>
+-->
 						<li><a href="#mvc">MVC architecture</a></li>
 						<li><a href="#routing">Routing</a></li>
 					</ul>
 				</div>
 			</div>
-			<div id="getting-started">
-				<h1>Getting started</h1>
+			<div id="mvc" class="span6">
+				<h1>MVC architecture</h1>
+				<h2>Generalities - Crash course</h2>
+				<p>
+					The framework is built upon the MVC architecture. This architecture divides the code in 3 parts :
+				</p>
+				<ul>
+					<li>The controller, which does the back-end computing. It mades the model and the view work together.</li>
+					<li>The model, which does interface the database with the controller. In an <a href="http://en.wikipedia.org/wiki/Object-relational_mapping">object-relational mapping</a>, it represents your data structure in the code.</li>
+					<li>The view, which is simply what the final user sees (the frontend)</li>
+				</ul>
+				<p>
+					<a href="../images/mvc.svg">Here is a schematic view of this architecture</a>
+				</p>
+			</div>
+			<div class="span11">
+				<h2>In Namespace-PIP</h2>
+				<p>
+					In Namespace-PIP, as in PIP (and also a lot of other frameworks), the framework divides these parts into different files. These files are put in the root folder for your website, <code>/application/</code> (relative to the framework's root) :
+				</p>
+				<ul>
+					<li>in the <code>controllers</code> folder for the controllers,</li>
+					<li>in the <code>models</code> folder for the models,</li> 
+					<li>in the <code>views</code> folder for the views.</li>
+				</ul>
+				<div class="alert alert-info">
+					<em><strong>Note:</strong> All the filenames are expected to be in complete lower case, except for exception files.</em>
+				</div>
+				<p>
+					There is already an sample controller, a sample model and a sample view in the framework. You can use them to start builing your website, they contain a minimal setup for one page. There is a few rules for making your components in Namespace-PIP :
+				</p>
+				<ul>
+					<li>Every controller is a class extending the <code>Controller</code> class.</li>
+					<li>Every controller has to be in the <code>Controller</code> namespace.</li>
+					<li>In a controller, a page is represented by a function, bound to a route in the config file.</li>
+					<li>Every model is a class extending either the <code>Model</code> class (using a database) or the <code>ModelNoDB</code> class (not using a database).</li>
+					<li>Every model has to be in the <code>Model</code> namespace.</li>
+					<li>The view is just a PHP file, containing the HTML and the few structures (conditions and iterations) that will allow to output variable data.</li>
+				</ul>
+				<p>For example, here is an annotated version of the example controller :</p>
+				<pre class="prettyprint linenums">
+&lt;?php
+namespace Controller; //The controller is defined into the Controller namespace.
+use \View\View; //Don't forget to include all the classes from other namespaces you'll use.
+                //It includes Models and the View class, each in their respective namespaces.
+
+class Main extends Controller //The controller extends the Controller class.
+{
+	public function index() //This method is bound to a route (in the config), so it's a page.
+	{
+		$template = new View('main'); //We instanciate a View from the view file main.php
+		$template-&gt;render(); //We render it and show it to the world
+	}
+}
+
+?&gt;	</pre>
+			<p>
+				In extension to theses rules, the way you put the classes in the files is also important. If you keep one class per file (and name the files after that class name), the framework will do the association alone and load the class when you'll need it. If not, you'll need either to include the file (if it's a model) or specify in the configuration all the files which need to be loaded for each class with <code>$config['autoload']</code> (there is already data in it, as an array, be careful to not overwrite it).
+			</p>
+			</div>
+			<div class="span11">
+				<h2>The Controller</h2>
+				<p>
+					As said above, the controller is the starting point of your page. It receives the data from the client (see <a href="#routing">Routing</a> section), processes it (optionally with a Model), creates a view and passes the data to it. It's also the central point of your page.
+				</p>
+				<p>
+					In the controller (which represents a <strong>section</strong> of your website), a page is represented by a method. The method can take parameters, which are given by the routing system if it is correctly configured. The sample controller (above) defines only one page (named "index") with no parameter. Note that, with default routes defined in config (the ones supplied in <code>config.sample.php</code>), the method called when you don't specify it in the URL will be <code>index</code>. This behavior can be changed just by editing the configuration file.
+				</p>
+				<p>
+					The controller gives you a few functions (only two at the moment) to help you :
+					<ul>
+						<li><code>Controller::redirect($url)</code> : Redirects the client to another page, using the Location header. The <code>$url</code> parameter has to be a virtual path (i.e. a path that will be routed) to the destination page, from the site root.</li>
+						<li><code>Controller::HTTPReturnCode($code)</code> : Sets the return code of the page, and its message. You just have to put the desired return code as parameter. If you want to have a list of available codes, they're in <code>/system/utils/http_codes.php</code>.</li>
+					</ul>
+					Please note that these methods are not static, call them with <code>$this-></code>.
+				</p>
+				<p>
+					To call models and views in your controller, you just have to instanciate the classes (using <code>new</code>, after declaring them in your namespace with <code>use</code>), and start using it. Example :
+				</p>
+				<pre class="prettyprint linenums">
+&lt;?php
+namespace Controller;
+use \View\View;
+use \Model\Example as ExampleModel; //Aliasing the model name is optional.
+
+class Main extends Controller //The controller extends the Controller class.
+{
+	public function index() //This method is bound to a route (in the config), so it's a page.
+	{
+		$model = new ExampleModel();
+		$data = $model-&gt;getSomething(0);
+		$template = new View('main');
+		$template-&gt;data = $data;
+		$template-&gt;render();
+	}
+}
+
+?&gt;			</pre>
 			</div>
 		</div>
 	</div>
 </body>
 </html>
+
+<!--  You can use PHP's <a href="http://www.php.net/manual/en/control-structures.alternative-syntax.php">alternative syntax</a> to make the code clearer. All links are converted to match the good path from the root of the webserver. -->
