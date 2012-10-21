@@ -9,7 +9,7 @@ $config['error_controller_file'] = 'error.php'; // Controller file used for erro
 $config['exception_handler'] = 'exception'; //Exception handler method (from error_controller)
 $config['debug'] = true; //Debug activation
 $config['hash_salt'] = ''; //Hash salt for passwords
-
+$config['google_phishing_api_key'] = '';//Key for Google Phishing Lookup API
 // Routes
 // These reproduce the way of routing addresses coming from older versions of PIP
 $config['routes'] = array(
