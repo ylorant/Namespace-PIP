@@ -1,15 +1,18 @@
 <?php
 namespace Plugin;
+use \Debug;
 
 class Security
 {
 	public static function checkURL($address)
 	{
-		if(filter_var($address, FILTER_VALIDATE_URL) == FALSE)
+		global $config;
+		
+		if(filter_var($address, FILTER_VALIDATE_URL))
 		{
-			$check = file_get_contents('https://sb-ssl.google.com/safebrowsing/api/lookup?client=api&apikey='.$config["google_phishing_api_key"].'&appver=1.0&pver=3.0&url='.$address);
+			$check = file_get_contents('https://sb-ssl.google.com/safebrowsing/api/lookup?client=api&apikey='.$config["google_phishing_api_key"].'&appver=1.0&pver=3.0&url='.urlencode($address));
 			
-			if($check == "ok")
+			if($check == "ok" || $check == "")
 				return true;
 			else
 				return false;
