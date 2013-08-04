@@ -2,7 +2,6 @@
 /*
  * PIP v0.5.3
  */
-
 //Start the Session
 session_start(); 
 
@@ -26,11 +25,13 @@ $config['autoload']['Model\ModelNoDB'] = ROOT_DIR .'system/mvc/model.nodb.php';
 $config['autoload']['View\View'] = ROOT_DIR .'system/mvc/view.php';
 $config['autoload']['Debug'] = ROOT_DIR .'system/utils/debug.php';
 $config['autoload']['Route'] = ROOT_DIR.'system/utils/route.php';
+$config['autoload']['Router'] = ROOT_DIR.'system/utils/route.php';
 
 // Includes
 require(ROOT_DIR .'system/utils/handlers.php');
 require(ROOT_DIR .'system/pip.php');
 require(APP_DIR .'config/config.php');
+
 Debug::getInstance();
 
 define('BASE_URL', $config['base_url']);

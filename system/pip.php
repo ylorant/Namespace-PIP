@@ -1,6 +1,6 @@
 <?php
 namespace Controller;
-use \Exception, \Debug;
+use \Exception, \Debug, \Router;
 use \View\View;
 
 function pip()
@@ -25,40 +25,23 @@ function pip()
 	// Routing //
 	//         //
 	
-    if(isset($config['routes']) && !empty($config['routes']))
-    {
-		foreach($config['routes'] as $route)
-		{
-			if($route->match($url))
-			{
-				$call = explode('::', $route->mapping());
-				
-				if(strpos($call[0], 'Controller\\') === FALSE)
-					$call[0] = '\\Controller\\'.$call[0];
-				
-				$class = $call[0];
-				$func = $call[1];
-				$obj = new $class();
-				
-				if($route->callback !== null)
-				{
-					$cb = $route->callback;
-					$cb($obj);
-				}
-				
-				call_user_func_array(array($obj, $func), $route->matches);
-				die();
-			}
-		}
-	}
+	$router = new Router();
+	$router->addRoutes($config['routes']);
+	$callback = $router->route($url);
     
-    // Error handling (404)
-	$controller = $config['error_controller'];
-	$action = 'index';
+    if(empty($callback))
+    {
+		// Error handling (404)
+		$controller = $config['error_controller'];
+		$action = 'index';
 	
-	// Create object and call method
-	$obj = new $controller;
-    call_user_func_array(array( $obj, $action), $route->matches);
+		// Create object and parameters
+		$obj = new $controller;
+		$callback = array("func" => array($obj, $action), "param" => null);
+	}
+	
+	
+    call_user_func_array($callback["func"], $callback["param"]);
     
     die();
 }

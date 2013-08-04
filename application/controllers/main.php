@@ -9,6 +9,11 @@ class Main extends Controller
 		$template = new View('main');
 		$template->render();
 	}
+	
+	public function second()
+	{
+		echo "Second view";
+	}
 }
 
 ?>
