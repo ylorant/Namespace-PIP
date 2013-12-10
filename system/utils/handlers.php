@@ -64,6 +64,12 @@ function __autoload($class)
 					break;
 			}
 			
+			if(isset($config["autoload"][$classNS[0]."\\*"]))
+			{
+				foreach($config["autoload"][$classNS[0]."\\*"] as $path)
+					$paths[] = str_replace(array('$class', '$Class'), array(strtolower($classNS[1]), $classNS[1]), $path);
+			}
+			
 			//Check if file exists in specified paths
 			foreach($paths as $path)
 			{

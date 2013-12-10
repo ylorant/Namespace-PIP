@@ -19,7 +19,7 @@ class JSON
 	public function __get($var)
 	{
 		if(isset($this->data[$var]))
-			return $this->$var;
+			return $this->data[$var];
 		else
 			return null;
 	}
